@@ -1,84 +1,80 @@
 import random
-def print_board(board):
-    print(f" {board[0][0]} | {board[0][1]} | {board[0][2]} ")
-    print("---|---|---")
-    print(f" {board[1][0]} | {board[1][1]} | {board[1][2]} ")
-    print("---|---|---")
-    print(f" {board[2][0]} | {board[2][1]} | {board[2][2]} ")
-    print()
+import numpy as np
 
-def check_winner(board):
-    # Check rows and columns
+board = [["-"] * 3 for _ in range(3)]
+
+def check_win():
     for i in range(3):
-        if board[i][0] == board[i][1] == board[i][2] != ' ':
-            return board[i][0]
-        if board[0][i] == board[1][i] == board[2][i] != ' ':
-            return board[0][i]
-   
-    # Check diagonals
-    if board[0][0] == board[1][1] == board[2][2] != ' ':
-        return board[0][0]
-    if board[0][2] == board[1][1] == board[2][0] != ' ':
-        return board[0][2]
-   
+        if board[i][0] == board[i][1] == board[i][2] != "-":
+            return True
+        if board[0][i] == board[1][i] == board[2][i] != "-":
+            return True
+
+    if board[0][0] == board[1][1] == board[2][2] != "-":
+        return True
+    if board[0][2] == board[1][1] == board[2][0] != "-":
+        return True
+
+    return False
+
+def full():
+    return all(cell != "-" for row in board for cell in row)
+
+def can_win(m):
+    for i in range(3):
+        row = board[i]
+        if row.count(m) == 2 and row.count("-") == 1:
+            return (i, row.index("-"))
+
+    for i in range(3):
+        col = [board[j][i] for j in range(3)]
+        if col.count(m) == 2 and col.count("-") == 1:
+            return (col.index("-"), i)
+
+    diag1 = [board[i][i] for i in range(3)]
+    if diag1.count(m) == 2 and diag1.count("-") == 1:
+        return (diag1.index("-"), diag1.index("-"))
+
+    diag2 = [board[i][2 - i] for i in range(3)]
+    if diag2.count(m) == 2 and diag2.count("-") == 1:
+        return (diag2.index("-"), 2 - diag2.index("-"))
+
     return None
 
-def is_board_full(board):
-    for row in board:
-        if ' ' in row:
-            return False
-    return True
+def display():
+    print(np.array(board))
 
-def main():
-    board = [[' ' for _ in range(3)] for _ in range(3)]
-    iteration = 0
-    winner = None
+while True:
+    display()
+    u = tuple(map(int, input("Enter row and column for X (0-2): ").strip().split()))
+    if board[u[0]][u[1]] != "-":
+        print("Invalid move, try again.")
+        continue
 
-    while winner is None:
-        
+    board[u[0]][u[1]] = "X"
 
-        # Alternate between 'X' and 'O'
-        if iteration % 2 == 0:
-            print_board(board)
-       
-            try:
-                row = int(input("Input row (1-3): ")) - 1
-                column = int(input("Input column (1-3): ")) - 1
-            except ValueError:
-                print("Invalid input. Please enter numbers between 1 and 3.")
-                continue
+    if check_win():
+        display()
+        print("X wins!")
+        break
+
+    if full():
+        display()
+        print("It's a tie!")
+        break
     
-            if row not in range(3) or column not in range(3):
-                print("The number of rows or columns is out of bounds. Please enter numbers between 1 and 3.")
-                continue
-    
-            if board[row][column] != ' ':
-                print("The position has already been entered! Please try another position.")
-                continue
-            board[row][column] = 'O'
-        else:
-            row = random.randrange(3)
-            column = random.randrange(3)
-            while(board[row][column] != ' '):
-                row = random.randrange(3)
-                column = random.randrange(3)
-            board[row][column] = 'X'
-       
-        iteration += 1
+    move = can_win("O")
+    print(move)
+    if move is None:
+        move = can_win("X")
+        if move is None:
+            empty = [(i, j) for i in range(3) for j in range(3) if board[i][j] == "-"]
+            move = random.choice(empty)
+    if board[1][1]=="-":
+        move=(1 ,1)
+    board[move[0]][move[1]] = "O"
 
-        # Check for winner
-        winner = check_winner(board)
-        if winner:
-            print_board(board)
-            print(f"Player {winner} wins!")
-            break
-
-        # Check for draw
-        if is_board_full(board):
-            print_board(board)
-            print("It's a draw!")
-            break
-
-if __name__ == "__main__":
-    print(" user:O \n bot:X")
-    main()
+    if check_win():
+        display()
+        print("O wins!")
+        break

@@ -1,53 +1,53 @@
-# Iterative Deepening Depth-First Search (IDDFS) in Python
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.children = []  # List to hold children nodes
 
-class Graph:
-    def __init__(self, vertices):
-        self.V = vertices  # Number of vertices
-        self.graph = {i: [] for i in range(vertices)}  # Graph representation
-    
-    # Add edge to the graph
-    def add_edge(self, u, v):
-        self.graph[u].append(v)
+    def add_child(self, child_node):
+        self.children.append(child_node)
 
-    # Depth-Limited Search (DLS)
-    def dls(self, src, target, limit):
-        if src == target:
+def iddfs(root, goal):
+    for i in range(0,100000):
+        res=dls(root,goal,i)
+        if res:
+            print("Found")
+            return
+    print("Not found")
+
+def dls(root,goal,depth):
+    if depth==0:
+        if root.value==goal:
             return True
-        if limit <= 0:
-            return False
-
-        for neighbor in self.graph[src]:
-            if self.dls(neighbor, target, limit - 1):
-                return True
-
         return False
+    for child in root.children:
+        if dls(child,goal,depth-1):
+            return True
+    return False
 
-    # Iterative Deepening Search (IDS)
-    def iddfs(self, src, target, max_depth):
-        for depth in range(max_depth):
-            if self.dls(src, target, depth):
-                return True
-        return False
+root=TreeNode("Y")
+node1=TreeNode("P")
+node2=TreeNode("X")
+node3=TreeNode("R")
+node4=TreeNode("S")
+node5=TreeNode("F")
+node6=TreeNode("H")
+node7=TreeNode("B")
+node8=TreeNode("C")
+node9=TreeNode("S")
 
+root.add_child(node1)
+root.add_child(node2)
 
-# Example Usage
-g = Graph(7)  # Initialize a graph with 7 nodes
+node1.add_child(node3)
+node1.add_child(node4)
 
-# Add edges
-g.add_edge(0, 1)
-g.add_edge(0, 2)
-g.add_edge(1, 3)
-g.add_edge(1, 4)
-g.add_edge(2, 5)
-g.add_edge(2, 6)
+node2.add_child(node5)
+node2.add_child(node6)
 
-# Source and target
-src = 0
-target = 6
-max_depth = 3  # Set max depth
+node3.add_child(node7)
+node3.add_child(node8)
 
-# Run IDDFS
-if g.iddfs(src, target, max_depth):
-    print(f"Target {target} found within depth {max_depth}.")
-else:
-    print(f"Target {target} not found within depth {max_depth}.")
+node4.add_child(node9)
+
+iddfs(root, "F")
+iddfs(root, "A")
